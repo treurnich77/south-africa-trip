@@ -1,0 +1,53 @@
+name: Final CarFlexi and budget update
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: "!contains(github.event.head_commit.message, '[final-carflexi-done]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update itinerary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          reps = {
+            'Return:</span> Jan 17, 2027 — 16:30 — OR Tambo (JNB)': 'Return:</span> Jan 17, 2027 — <b>17:30</b> — OR Tambo (JNB)',
+            'Current Receipt Number:</span> <b>See current e-Voucher / My Booking</b> — the confirmation email does not state the receipt number.': 'Current Receipt Number:</span> <b>8289061</b>',
+            'Current Amount Already Paid:</span> <b>See current e-Voucher / My Booking</b> — the confirmation email does not state the amount.': 'Current Amount Already Paid:</span> <b>USD 388.80</b>',
+            'Current Amount Payable at Desk:</span> <b>See current e-Voucher / My Booking</b> — the confirmation email does not state the amount.': 'Current Amount Payable at Desk:</span> <b>ZAR 34,850 (~USD 2,093 at current planning FX)</b>',
+            'Unlimited Kilometers / Insurance / Excess / Deposit / Fuel Policy:</span> use the current e-Voucher as the controlling document; CarFlexi warns the replacement booking details may differ from the cancelled booking.': 'Rental Period:</span> <b>41 days</b><br>\n<span class="big">Unlimited Kilometers / Insurance / Excess / Deposit / Fuel Policy:</span> use the current e-Voucher as the controlling document; CarFlexi warns the replacement booking details may differ from the cancelled booking.',
+            'Previous CarFlexi CF11E9FD downpayment: $440.74 USD — REFUNDED. Current CFD1FD74 prepayment: see current e-Voucher / My Booking (not stated in confirmation email)': 'Previous CarFlexi CF11E9FD downpayment: $440.74 USD — REFUNDED<br>\nCurrent CarFlexi CFD1FD74 payment: <b>$388.80 USD PAID</b>',
+            'Known Paid Total excluding the current CFD1FD74 prepayment:</span> <span class="big">~$6,822.84 USD</span><br><span class="small">Add the current CFD1FD74 prepayment shown on the e-Voucher / My Booking once confirmed. The old $440.74 payment has been refunded.</span>': 'Known Paid Total:</span> <span class="big">~$7,211.64 USD</span><br><span class="small">Includes the current CFD1FD74 payment of $388.80. The old $440.74 payment has been refunded and is not counted.</span>',
+            'Fortuner rental desk balance: <b>see current CFD1FD74 e-Voucher / My Booking</b> — the old ~$2,130 figure belonged to the cancelled booking': 'Fortuner rental desk balance: <b>ZAR 34,850 (~$2,093 USD)</b>',
+            'Known Fixed / Booked Future Commitments excluding current CarFlexi desk balance:</span> <span class="big">~$4,859 USD + current CFD1FD74 desk balance</span>': 'Known Fixed / Booked Future Commitments:</span> <span class="big">~$7,026 USD</span>',
+            'This figure includes the rental balance, booked accommodation and fixed activities currently tracked. It excludes the exact Storms River lodging cost, the extra rental day from the Dec 7 pickup change, and the Jan 18 Houston hotel because those are still TBD.': 'This figure includes the current CarFlexi desk balance, booked accommodation and fixed activities currently tracked. Storms River is now known at $73.47 due Nov 22. The Jan 18 Houston hotel remains TBD.',
+            'Known fixed / booked future commitments: ~$4,859 USD + current CFD1FD74 desk balance': 'Known fixed / booked future commitments: ~$7,026 USD',
+            'Projected Additional Spend From Now:</span> <span class="big">~$11,400–$14,320 USD + current CFD1FD74 desk balance</span>': 'Projected Additional Spend From Now:</span> <span class="big">~$13,570–$16,490 USD</span>',
+            'Plus the exact Storms River accommodation amount and any extra Fortuner charge for moving pickup to Dec 7, once confirmed.': 'Storms River is confirmed at $73.47 due Nov 22. CarFlexi is now confirmed at $388.80 paid and R34,850 due at the rental desk. The Jan 18 Houston hotel remains the main unbooked fixed travel cost.',
+            'Already paid excluding current CFD1FD74 prepayment: ~$6,822.84 USD + current CFD1FD74 prepayment': 'Already paid: ~$7,211.64 USD',
+            'Plus projected future spend: ~$11,400–$14,320 USD + current CFD1FD74 desk balance': 'Plus projected future spend: ~$13,570–$16,490 USD',
+            'Projected Total Holiday Cost:</span> <span class="big">~$18,224–$21,144 USD + current CFD1FD74 prepayment + current CFD1FD74 desk balance</span>': 'Projected Total Holiday Cost:</span> <span class="big">~$20,782–$23,702 USD</span>',
+            '<span class="big">Dining:</span> Self-catering accommodation<br><br>\n<span class="big">Route From Kenton-on-Sea:</span>': '<span class="big">Dining:</span> Self-catering accommodation<br>\n<span class="big">Cost / Balance Due:</span> <b>USD 73.47</b> — scheduled via Google Pay for Nov 22, 2026<br><br>\n<span class="big">Route From Kenton-on-Sea:</span>'
+          }
+          for a,b in reps.items():
+              if a not in s:
+                  print('WARNING missing:', a[:100])
+              s = s.replace(a,b)
+          p.write_text(s)
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "treurnich77"
+          git config user.email "treurnich77@gmail.com"
+          git add index.html
+          git commit -m "Finalize CarFlexi receipt and budget [final-carflexi-done]"
+          git push
