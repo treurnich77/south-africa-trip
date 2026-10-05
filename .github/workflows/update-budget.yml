@@ -1,0 +1,129 @@
+name: Update trip budget
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-budget:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update budget section
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          start = s.index('<section class="section" id="budget">')
+          end = s.index('</section>', start) + len('</section>')
+          new = '''<section class="section" id="budget">
+          <div class="title">Budget, Wild Card & Final Planning Summary</div>
+          <span class="big">Already Paid / Out of Pocket:</span><br>
+          International flights: ~$4,650 USD<br>
+          Travel insurance: $1,161.84 USD<br>
+          Fortuner rental prepayment: $440.74 USD<br>
+          Gooderson Drakensberg Gardens deposit: ~$488 USD<br>
+          Wild Cards: ~$523 USD<br>
+          <span class="big">Known Paid Total:</span> <span class="big">~$7,263.58 USD</span><br><br>
+
+          <span class="big">Booked / Planned Costs Still To Be Paid:</span><br>
+          This section treats confirmed or planned bookings as future spend unless they are specifically listed above as paid.<br>
+          Fortuner rental desk balance: ~$2,130 USD<br>
+          Remaining booked accommodation / fixed stays currently tracked: included below<br>
+          Two Wild Olives revised 2-night estimate: ~$206.57 USD (final Airbnb reprice TBD)<br>
+          Ukutula planned total: ~$455 USD<br>
+          Sun City planning allowance: ~$100 USD<br>
+          Pilanesberg planning allowance: up to ~$382 USD for two entry days<br>
+          <span class="big">Known Fixed / Booked Future Commitments:</span> <span class="big">~$6,989 USD</span><br>
+          <span class="small">This figure includes the rental balance, booked accommodation and fixed activities currently tracked. It excludes the exact Storms River lodging cost, the extra rental day from the Dec 7 pickup change, and the Jan 18 Houston hotel because those are still TBD.</span><br><br>
+
+          <span class="big">Revised Fuel Budget:</span><br>
+          The previous 8,000 km / $1,150–$1,300 estimate was too low because it did not fully capture game-drive loops, sightseeing circuits, local errands and the revised Pilanesberg / Sun City / Ukutula leg.<br>
+          <span class="big">Realistic Total Driving Range:</span> ~9,000–10,000 km<br>
+          <span class="big">Budgeting Midpoint:</span> ~9,500 km<br>
+          <span class="big">Assumed Fortuner Economy:</span> ~9 km/L loaded<br>
+          <span class="big">Fuel Needed at 9,500 km:</span> ~1,056 L<br>
+          <span class="big">Diesel Planning Price:</span> R31.88/L = ~$1.94 USD/L<br>
+          <span class="big">Fuel Cost at 9,000 km:</span> ~1,000 L = R31,880 = ~$1,940 USD<br>
+          <span class="big">Fuel Cost at 9,500 km:</span> ~1,056 L = ~R33,650 = ~$2,048 USD<br>
+          <span class="big">Fuel Cost at 10,000 km:</span> ~1,111 L = ~R35,420 = ~$2,155 USD<br>
+          <span class="big">Revised Fuel Budget:</span> <span class="big">~$1,940–$2,160 USD</span><br>
+          <span class="small">This uses the current diesel price you supplied as a planning assumption. Actual December/January pump prices may differ.</span><br><br>
+
+          <span class="big">Projected Food Budget:</span><br>
+          Mix of groceries + restaurants + road-trip meals for 4 adults:<br>
+          <span class="big">~$2,500–$3,500 USD</span><br><br>
+
+          <span class="big">Projected Shopping / Gifts / Personal Spend:</span><br>
+          <span class="big">~$1,000–$2,000 USD</span><br><br>
+
+          <span class="big">Other Activity / Entry Fees Still Payable:</span><br>
+          Table Mountain Cableway<br>
+          Boat cruise / optional wildlife encounters<br>
+          Other paid attractions not already itemized above<br>
+          <span class="big">Allowance:</span> ~$400–$900 USD<br><br>
+
+          <span class="big">New York / Newark Ground-Day Allowance:</span><br>
+          Rail / local transport + meals + light sightseeing for 4:<br>
+          <span class="big">~$450–$550 USD</span><br><br>
+
+          <span class="big">Houston Return Overnight — Jan 18:</span><br>
+          Hotel + airport meals / local transport allowance:<br>
+          <span class="big">~$250–$350 USD</span><br><br>
+
+          <hr>
+          <span class="big">Projected Spend From Now:</span><br>
+          Known fixed / booked future commitments: ~$6,989 USD<br>
+          Fuel: ~$1,940–$2,160 USD<br>
+          Food: ~$2,500–$3,500 USD<br>
+          Shopping / gifts: ~$1,000–$2,000 USD<br>
+          Other activities: ~$400–$900 USD<br>
+          New York / Newark day: ~$450–$550 USD<br>
+          Houston return overnight: ~$250–$350 USD<br>
+          <span class="big">Projected Additional Spend From Now:</span> <span class="big">~$13,530–$16,450 USD</span><br>
+          <span class="small">Plus the exact Storms River accommodation amount and any extra Fortuner charge for moving pickup to Dec 7, once confirmed.</span><br><br>
+
+          <span class="big">Projected Overall Trip Cost:</span><br>
+          Already paid: ~$7,263.58 USD<br>
+          Plus projected future spend: ~$13,530–$16,450 USD<br>
+          <span class="big">Projected Total Holiday Cost:</span> <span class="big">~$20,795–$23,715 USD</span><br>
+          <span class="small">This supersedes the previous ~$18,000–$21,000 estimate, which understated fuel and did not fully include the revised Sun City / Pilanesberg / Ukutula final leg.</span><br><br>
+
+          <hr>
+          <span class="big">Wild Card Access:</span><br>
+          Family Card: International All Parks Cluster — R8,745 (~$473 USD)<br>
+          Family Wild Card Number: 1005245710<br>
+          Steven Individual Card — R930 (~$50 USD)<br>
+          Steven Wild Card Number: 1005244645<br>
+          Combined Wild Card Cost: <span class="big">R9,675 (~$523 USD)</span><br><br>
+          <span class="big">Wild Card Covers / Used For:</span><br>
+          Kruger National Park<br>
+          Addo Elephant National Park<br>
+          Garden Route National Park<br>
+          CapeNature Reserves (e.g. Robberg)<br>
+          Hluhluwe–iMfolozi Park<br>
+          Boulders Beach / Cape Point where applicable<br><br>
+          <span class="big">Wild Card Proof of Purchase:</span><br>
+          Family Card (Stephanie + Girls): <a href="https://drive.google.com/file/d/1bP9v5jqjuKSfpT48xmNwbtjrAfnvVvoQ/view?usp=sharing" target="_blank">Open Wild Card PDF</a><br>
+          Steven Card: <a href="https://drive.google.com/file/d/1TVweGunos1rwm27AC6ZQtYFgQhmuSatw/view?usp=sharing" target="_blank">Open Wild Card PDF</a><br>
+          Save PDFs + screenshots on phone and have passports available when entering parks<br><br>
+          <span class="save">Running Logged Wild Card Savings So Far: R18,385 (~$994 USD)</span><br>
+          <span class="save">Break-Even Point Passed By: R8,710 (~$471 USD)</span>
+          <div class="info">Budget now separates money already paid from booked-but-unpaid commitments and from variable future spending, with the fuel estimate recalculated for the revised road-trip plan.</div>
+          </section>'''
+          s = s[:start] + new + s[end:]
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Update fuel and trip budget [skip ci]"
+          git push
