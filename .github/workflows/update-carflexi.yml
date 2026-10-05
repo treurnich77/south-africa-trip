@@ -1,0 +1,85 @@
+name: Update CarFlexi itinerary
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: "!contains(github.event.head_commit.message, '[carflexi-done]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update itinerary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old='''<section class="section" id="car">
+<div class="title">Mon Dec 7 — Revised Vehicle Pickup at Johannesburg Airport</div>
+<div class="badges"><span class="badge">CHANGE REQUESTED</span><span class="badge blue">EVENING PICKUP</span></div>
+<span class="big">Vehicle:</span> Toyota Fortuner or Similar<br>
+<span class="big">Type:</span> Automatic SUV — 7 Seater Diesel<br>
+<span class="big">Rental Voucher:</span> CF11E9FD<br>
+<span class="big">Provider Confirmation:</span> 18203683<br>
+<span class="big">Original Pickup:</span> Dec 8 2026 — 08:00 — OR Tambo (JNB)<br>
+<span class="big">Revised Target Pickup:</span> <b>Evening Dec 7</b>, after arriving at JNB, clearing immigration/customs and collecting baggage — exact time to be confirmed with the rental provider.<br>
+<span class="big">Return:</span> Jan 17 2027 — 16:30 — OR Tambo (JNB)<br>
+<span class="big">Unlimited Kilometers:</span> Included<br>
+<span class="big">Insurance:</span> Full Insurance Package Included<br>
+<span class="big">Excess:</span> R40,000<br>
+<span class="big">Deposit:</span> R14,800<br>
+<span class="big">Fuel Policy:</span> Return Full<br>
+<span class="big">Amount Already Paid:</span> USD 440.74<br>
+<span class="big">Original Amount Payable at Desk:</span> ZAR 39,438.00 (~$2,130 USD)<br>
+<span class="big">Original Estimated Total Vehicle Hire:</span> ~$2,571 USD<br>
+<span class="big">Revised Rental Duration:</span> approximately 42 days if the pickup is moved to Dec 7<br>
+<span class="big">Extra Day Cost:</span> <b>TBD — provider must reprice the booking</b><br>
+<span class="big">Receipt Number:</span> 7945435<br>
+<span class="big">CarFlexi Voucher:</span> CF11E9FD
+<div class="info">Revised plan: collect the Fortuner on arrival night so the vehicle is already available for the early Benoni Home Affairs trip on Dec 8.</div>
+</section>'''
+          voucher='https://u38569324.ct.sendgrid.net/ls/click?upn=u001.ajX-2FN7F2k0UGJGiQJ9K4lZV0MsUkHfLBZGf2i9kUZ2PnBmP2REAlWh87t00yzXfXyYObwYs3BmeUU6mXTBiTHfw4Kwxo4IWto5lpTq84PZ0LU9n0Ylnoy4xnVhN-2BuLp0n9NiLeQqLKEgnn5sM8xF0J9DQpVukgLDVEPbjPIfA1gqon-2FpFT6BRhsYAtOVGrTwAh2IxcCHZ-2BZR94CKpI6kI5ucWB34FP5oWGe46zeH3vA-3DELMt_Q8Wwi50Du-2F8Gh9HEVfnsD8K-2FeJnZKrJDcuJwJbDA43N8d6Kkn8UYsbPdD3ETYhroUd-2F3hRkgIb5JpifIO0qezJTq8lGHtzqzpRQQDx5NFXh9pTqYMbaD7vo-2BF7AgNtI6E3SJU7EiWRf9-2BOhFzmCuEpRFetYQKP0eA948kSHhLIHIMm51jLfYXvhj72F0OctDgl2Qcpgm4HmNCua9lfMWnQ-3D-3D'
+          new=f'''<section class="section" id="car">
+<div class="title">Mon Dec 7 — Fortuner Pickup at Johannesburg Airport (CONFIRMED)</div>
+<div class="badges"><span class="badge green">CONFIRMED</span><span class="badge blue">20:00 PICKUP</span></div>
+<span class="big">Vehicle:</span> Toyota Fortuner or Similar<br>
+<span class="big">Type:</span> Automatic SUV — 7 Seater Diesel<br>
+<span class="big">Current CarFlexi Booking / Voucher:</span> <b>CFD1FD74</b><br>
+<span class="big">Pickup:</span> Dec 7, 2026 — <b>20:00</b> — Johannesburg / OR Tambo<br>
+<span class="big">Return:</span> Jan 17, 2027 — 16:30 — OR Tambo (JNB)<br>
+<span class="big">Status:</span> Confirmed by CarFlexi on Oct 5, 2026<br>
+<span class="big">Online e-Voucher:</span> <a href="{voucher}" target="_blank">Open Current CarFlexi Voucher</a><br>
+<span class="big">Old Booking:</span> CF11E9FD — cancelled; CarFlexi confirms its downpayment has been refunded to the credit card.<br>
+<span class="big">Current Receipt Number:</span> <b>See current e-Voucher / My Booking</b> — the confirmation email does not state the receipt number.<br>
+<span class="big">Current Amount Already Paid:</span> <b>See current e-Voucher / My Booking</b> — the confirmation email does not state the amount.<br>
+<span class="big">Current Amount Payable at Desk:</span> <b>See current e-Voucher / My Booking</b> — the confirmation email does not state the amount.<br>
+<span class="big">Unlimited Kilometers:</span> verify on current e-Voucher<br>
+<span class="big">Insurance / Excess / Deposit / Fuel Policy:</span> use the current e-Voucher as the controlling document because CarFlexi warns that details may differ from the cancelled booking.
+<div class="info">The Dec 7 evening pickup is now confirmed, so the Fortuner is available for the early Benoni Home Affairs trip on Dec 8. Use the linked current e-Voucher rather than the cancelled CF11E9FD voucher.</div>
+</section>'''
+          if old not in s:
+              raise SystemExit('Old car block not found')
+          s=s.replace(old,new)
+          s=s.replace('Fortuner rental prepayment: $440.74 USD','Previous CarFlexi CF11E9FD downpayment: $440.74 USD — REFUNDED. Current CFD1FD74 prepayment: see current e-Voucher / My Booking (not stated in confirmation email)')
+          s=s.replace('<span class="big">Known Paid Total:</span> <span class="big">~$7,263.58 USD</span>','<span class="big">Known Paid Total excluding the current CFD1FD74 prepayment:</span> <span class="big">~$6,822.84 USD</span><br><span class="small">Add the current CFD1FD74 prepayment shown on the e-Voucher / My Booking once confirmed. The old $440.74 payment has been refunded.</span>')
+          s=s.replace('Fortuner rental desk balance: ~$2,130 USD','Fortuner rental desk balance: <b>see current CFD1FD74 e-Voucher / My Booking</b> — the old ~$2,130 figure belonged to the cancelled booking')
+          s=s.replace('<span class="big">Known Fixed / Booked Future Commitments:</span> <span class="big">~$6,989 USD</span>','<span class="big">Known Fixed / Booked Future Commitments excluding current CarFlexi desk balance:</span> <span class="big">~$4,859 USD + current CFD1FD74 desk balance</span>')
+          s=s.replace('Known fixed / booked future commitments: ~$6,989 USD','Known fixed / booked future commitments: ~$4,859 USD + current CFD1FD74 desk balance')
+          s=s.replace('<span class="big">Projected Additional Spend From Now:</span> <span class="big">~$13,530–$16,450 USD</span>','<span class="big">Projected Additional Spend From Now:</span> <span class="big">~$11,400–$14,320 USD + current CFD1FD74 desk balance</span>')
+          s=s.replace('Already paid: ~$7,263.58 USD','Already paid excluding current CFD1FD74 prepayment: ~$6,822.84 USD + current CFD1FD74 prepayment')
+          s=s.replace('Plus projected future spend: ~$13,530–$16,450 USD','Plus projected future spend: ~$11,400–$14,320 USD + current CFD1FD74 desk balance')
+          s=s.replace('<span class="big">Projected Total Holiday Cost:</span> <span class="big">~$20,795–$23,715 USD</span>','<span class="big">Projected Total Holiday Cost:</span> <span class="big">~$18,224–$21,144 USD + current CFD1FD74 prepayment + current CFD1FD74 desk balance</span>')
+          p.write_text(s)
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "treurnich77"
+          git config user.email "treurnich77@gmail.com"
+          git add index.html
+          git commit -m "Update CarFlexi booking and budget [carflexi-done]"
+          git push
