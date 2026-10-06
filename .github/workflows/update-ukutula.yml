@@ -1,0 +1,129 @@
+name: Update Ukutula booking
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: "!contains(github.event.head_commit.message, '[ukutula-done]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update itinerary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+
+          old='''<section class="section">
+<div class="title">Sat Jan 16–Sun Jan 17 — Ukutula Conservation Center (1 Night)</div>
+<div class="badges"><span class="badge green">AVAILABILITY CONFIRMED</span><span class="badge">FINAL NIGHT</span><span class="badge blue">LION EXPERIENCE</span></div>
+<span class="big">Accommodation:</span> Family Unit — 4 Adults<br>
+<span class="big">Date:</span> Jan 16–17, 2027<br>
+<span class="big">Accommodation Price:</span> R4,550 (about USD 274)<br>
+<span class="big">Predator Tour:</span> Included with accommodation<br>
+<span class="big">Predator Tour Time:</span> Sat Jan 16 — 14:00<br>
+<span class="big">Tour Duration:</span> about 2 hours<br><br>
+
+<span class="big">Bush Walk with Lions:</span><br>
+Sun Jan 17 — 08:00<br>
+About 90 minutes<br>
+R750 per person × 4 = R3,000 (about USD 181)<br><br>
+
+<span class="big">Ukutula Planned Total:</span> R7,550 (about USD 455)<br>
+<span class="big">50% Deposit:</span> about R3,775 (about USD 228), due within 3 working days once booking is issued / confirmed.<br>
+<span class="big">Refundable Key Deposit:</span> R500 cash — not counted as trip spend because it is refundable.<br><br>
+
+<span class="big">Optional Meals:</span><br>
+Breakfast R200 pp<br>
+Lunch R185 pp<br>
+Dinner R385 pp<br>
+Current plan remains self-catering / groceries unless you decide otherwise.<br><br>
+
+<span class="big">Sunday Departure:</span><br>
+Lion Walk at 08:00, then prepare to leave Ukutula for OR Tambo.<br>
+Ukutula → OR Tambo: about 165 km; allow roughly 2½–3 hours in real conditions.<br>
+Rental vehicle return booked for 16:30.<br>
+LH573 departs Johannesburg at 19:45.
+<div class="info">This replaces the third night at Two Wild Olives. Final sequence: Predator Tour Saturday afternoon, Lion Walk Sunday morning, then drive to OR Tambo for the evening flight.</div>
+</section>'''
+
+          new='''<section class="section">
+<div class="title">Sat Jan 16–Sun Jan 17 — Ukutula Lion Lodge & Research Centre (1 Night)</div>
+<div class="badges"><span class="badge green">R6,000 PAYMENT RECEIVED</span><span class="badge">FINAL NIGHT</span><span class="badge blue">PREDATOR TOUR + LION WALK</span></div>
+<span class="big">Accommodation:</span> Family 4 Sleep Chalet — 4 Adults<br>
+<span class="big">Date:</span> Jan 16–17, 2027<br>
+<span class="big">Invoice Number:</span> 56771<br>
+<span class="big">Accommodation Price:</span> R4,550<br>
+<span class="big">Predator Tour:</span> Included with accommodation<br>
+<span class="big">Predator Tour Slot:</span> Sat Jan 16 — 14:00<br>
+<span class="big">Tour Duration:</span> about 2 hours<br><br>
+
+<span class="big">Bush Walk with Lions:</span><br>
+Sun Jan 17 — 08:00<br>
+About 90 minutes<br>
+R750 per person × 4 = R3,000<br><br>
+
+<span class="big">Correct Booking Total:</span> <b>R7,550</b> (about USD 453 at current planning FX)<br>
+<span class="big">Payment Made:</span> <b>R6,000</b> on Oct 6, 2026 (about USD 360)<br>
+<span class="big">Balance Remaining:</span> <b>R1,550</b> (about USD 93)<br>
+<span class="big">Payment Method:</span> Visa via Yoco<br>
+<span class="big">Yoco Sale:</span> 2026/10/042251<br>
+<span class="big">Authorization:</span> 974659<br>
+<span class="big">Yoco Reference:</span> y0G9dDJTrwea<br>
+<span class="big">Payment Receipt:</span> <a href="https://www.yoco.co.za/receipts/y0G9dDJTrwea" target="_blank">Open Ukutula Yoco Receipt</a><br>
+<span class="big">Payment Status:</span> Yoco confirms R6,000 received. Ukutula has been emailed asking them to confirm payment and the booking; their final acknowledgment is still pending.<br><br>
+
+<span class="big">Availability / Slots:</span><br>
+Ukutula confirmed availability for all four guests on Jan 16 and 17. The requested programme is the 14:00 Predator Tour on Jan 16 and the 08:00 Bush Walk with Lions on Jan 17.<br><br>
+
+<span class="big">Refundable Key Deposit:</span> R500 cash on arrival — not counted as trip spend because it is refundable.<br>
+<span class="big">Cancellation:</span> bookings cancelled less than 2 weeks before arrival forfeit the full deposit; refundable cancellations are subject to a 10% administration fee.<br><br>
+
+<span class="big">Optional Meals:</span><br>
+Breakfast R200 pp — served 09:00<br>
+Lunch R185 pp — served 13:00<br>
+Dinner R385 pp — summer service at 19:00<br>
+Meals must be pre-booked at least 1 day before arrival. Current plan remains self-catering / groceries unless changed.<br><br>
+
+<span class="big">Sunday Departure:</span><br>
+Lion Walk at 08:00, then prepare to leave Ukutula for OR Tambo.<br>
+Ukutula → OR Tambo: about 165 km; allow roughly 2½–3 hours in real conditions.<br>
+Rental vehicle return booking currently shows 17:30, but plan to return earlier for the 19:45 LH573 departure.<br>
+<div class="info">Final-trip sequence: Predator Tour Saturday afternoon, overnight at Ukutula, Lion Walk Sunday morning, then OR Tambo for the evening flight.</div>
+</section>'''
+
+          if old not in s:
+              raise SystemExit('Old Ukutula block not found')
+          s=s.replace(old,new)
+
+          reps={
+            'Ukutula planned total: ~$455 USD':'Ukutula remaining balance: ~R1,550 (~$93 USD) — R6,000 deposit already paid',
+            '<span class="big">Known Paid Total:</span> <span class="big">~$7,211.64 USD</span>':'<span class="big">Known Paid Total:</span> <span class="big">~$7,572 USD</span>',
+            '<span class="small">Includes the current CFD1FD74 payment of $388.80. The old $440.74 payment has been refunded and is not counted.</span>':'<span class="small">Includes the current CFD1FD74 payment of $388.80 and the Ukutula R6,000 payment (~$360). The old $440.74 CarFlexi payment was refunded and is not counted.</span>',
+            '<span class="big">Known Fixed / Booked Future Commitments:</span> <span class="big">~$7,026 USD</span>':'<span class="big">Known Fixed / Booked Future Commitments:</span> <span class="big">~$6,664 USD</span>',
+            'Known fixed / booked future commitments: ~$7,026 USD':'Known fixed / booked future commitments: ~$6,664 USD',
+            '<span class="big">Projected Additional Spend From Now:</span> <span class="big">~$13,570–$16,490 USD</span>':'<span class="big">Projected Additional Spend From Now:</span> <span class="big">~$13,208–$16,128 USD</span>',
+            'Already paid: ~$7,211.64 USD':'Already paid: ~$7,572 USD',
+            'Plus projected future spend: ~$13,570–$16,490 USD':'Plus projected future spend: ~$13,208–$16,128 USD',
+            '<span class="big">Projected Total Holiday Cost:</span> <span class="big">~$20,782–$23,702 USD</span>':'<span class="big">Projected Total Holiday Cost:</span> <span class="big">~$20,780–$23,700 USD</span>'
+          }
+          for a,b in reps.items():
+              if a not in s:
+                  print('WARNING missing:', a)
+              s=s.replace(a,b)
+
+          p.write_text(s)
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "treurnich77"
+          git config user.email "treurnich77@gmail.com"
+          git add index.html
+          git commit -m "Update Ukutula payment and booking details [ukutula-done]"
+          git push
