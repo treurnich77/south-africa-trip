@@ -1,0 +1,11 @@
+from pathlib import Path
+p=Path('index.html')
+s=p.read_text()
+s=s.replace('<span class="big">Current 3-night booking:</span> USD 309.86 — amendment to 2 nights still needs to be reflected by Airbnb.<br>\n<span class="big">Provisional 2-night equivalent:</span> about USD 206.57; final revised Airbnb price TBD.<br><br>', '<span class="big">Revised Booking Status:</span> <b>ACCEPTED by Airbnb</b><br>\n<span class="big">Original 3-night total:</span> USD 309.86<br>\n<span class="big">Confirmed 2-night total:</span> <b>USD 216.26</b><br>\n<span class="big">Saving from shortening stay:</span> <b>USD 93.60</b><br>\n<span class="big">Reservation Code:</span> HME4AAE89J<br><br>')
+s=s.replace('Two Wild Olives revised 2-night estimate: ~$206.57 USD (final Airbnb reprice TBD)', 'Two Wild Olives confirmed 2-night total: $216.26 USD — Airbnb change accepted')
+s=s.replace('Known Fixed / Booked Future Commitments:</span> <span class="big">~$6,700 USD', 'Known Fixed / Booked Future Commitments:</span> <span class="big">~$6,710 USD')
+s=s.replace('Known fixed / booked future commitments: ~$6,700 USD', 'Known fixed / booked future commitments: ~$6,710 USD')
+s=s.replace('Projected Additional Spend From Now:</span> <span class="big">~$13,244–$16,164 USD', 'Projected Additional Spend From Now:</span> <span class="big">~$13,254–$16,174 USD')
+s=s.replace('Plus projected future spend: ~$13,244–$16,164 USD', 'Plus projected future spend: ~$13,254–$16,174 USD')
+s=s.replace('Projected Total Holiday Cost:</span> <span class="big">~$20,816–$23,736 USD', 'Projected Total Holiday Cost:</span> <span class="big">~$20,826–$23,746 USD')
+p.write_text(s)
