@@ -72,5 +72,11 @@ body{margin:0;background:#1f211b;color:#f7ead1;font-family:Arial,Helvetica,sans-
   }
 })();
 </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+}
+</script>
 </body>
 </html>
