@@ -16,6 +16,10 @@ body{margin:0;background:#1f211b;color:#f7ead1;font-family:Arial,Helvetica,sans-
 <body>
 <div class="loading"><b>South Africa Expedition Itinerary</b><br>Loading itinerary…</div>
 <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(console.error);
+}
+
 (async()=>{
   try{
     let html=await (await fetch('itinerary-source.html',{cache:'no-store'})).text();
@@ -73,10 +77,5 @@ body{margin:0;background:#1f211b;color:#f7ead1;font-family:Arial,Helvetica,sans-
 })();
 </script>
 
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
-}
-</script>
 </body>
 </html>
