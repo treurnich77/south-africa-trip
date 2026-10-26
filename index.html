@@ -9,73 +9,49 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
-<style>
-body{margin:0;background:#1f211b;color:#f7ead1;font-family:Arial,Helvetica,sans-serif;display:grid;place-items:center;min-height:100vh}.loading{padding:28px;text-align:center}.loading b{color:#f0c975}
-</style>
+<style>body{margin:0;background:#1f211b;color:#f7ead1;font-family:Arial,Helvetica,sans-serif;display:grid;place-items:center;min-height:100vh}.loading{padding:28px;text-align:center}.loading b{color:#f0c975}</style>
 </head>
 <body>
 <div class="loading"><b>South Africa Expedition Itinerary</b><br>Loading itinerary…</div>
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(console.error);
-}
-
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(console.error)}
 (async()=>{
-  try{
-    let html=await (await fetch('itinerary-source.html',{cache:'no-store'})).text();
-
-    html=html.replace('<a href="#weather">Weather</a>\n','');
-    html=html.replace(/<section class="section" id="weather">[\s\S]*?<\/section>\s*/,'');
-
-    const chipCss=`
-.weather-chip-row{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}
-.weather-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:.15px;box-shadow:0 2px 5px rgba(0,0,0,.08)}
-.weather-chip.blue{background:#dceaf7;color:#174a78;border:1px solid #9fc1df}
-.weather-chip.red{background:#f8d9d5;color:#8e241c;border:1px solid #e4aaa3}
-.weather-note{font-size:11px;color:#71695b;margin:-7px 0 12px;font-weight:700}
-`;
-    html=html.replace('</style>',chipCss+'\n</style>');
-
-    const temps=[
-      ['Mon Dec 7 — Johannesburg Airport Hotel (1 Night)','17–21°C','26–30°C','18–22°C'],
-      ['Tue Dec 8–Fri Dec 11 — Sabie / Panorama Route (3 Nights)','17–20°C','26–30°C','17–21°C'],
-      ['Fri Dec 11 — Kruger National Park — Skukuza (1 Night)','23–27°C','34–38°C','25–29°C'],
-      ['Sat Dec 12–Mon Dec 14 — Kruger National Park — Satara (2 Nights)','24–28°C','35–39°C','25–30°C'],
-      ['Mon Dec 14 — Kruger National Park — Orpen (1 Night)','23–27°C','34–39°C','24–29°C'],
-      ['Tue Dec 15 — Ermelo Stopover (1 Night)','15–19°C','25–29°C','16–20°C'],
-      ['Wed Dec 16–Thu Dec 17 — Spion Kop Lodge (1 Night)','17–21°C','28–32°C','18–22°C'],
-      ['Thu Dec 17–Mon Dec 21 — Drakensberg (4 Nights)','12–17°C','23–27°C','12–17°C'],
-      ['Mon Dec 21–Sat Dec 26 — Empangeni / Hluhluwe / St Lucia / Richards Bay (5 Nights)','22–25°C','29–33°C','23–27°C'],
-      ['Sat Dec 26–Sun Dec 27 — Kokstad (1 Night)','15–19°C','25–29°C','16–20°C'],
-      ['Sun Dec 27–Mon Dec 28 — Beacon Bay / East London (1 Night)','19–22°C','24–28°C','20–23°C'],
-      ['Mon Dec 28–Wed Dec 30 — Kenton-on-Sea (2 Nights)','19–22°C','24–28°C','20–23°C'],
-      ['Wed Dec 30–Thu Dec 31 — Storms River (1 Night)','17–20°C','22–26°C','17–21°C'],
-      ['Thu Dec 31–Sat Jan 2 — Knysna / Robberg / Knysna Heads (2 Nights)','18–21°C','24–28°C','19–22°C'],
-      ['Sat Jan 2–Fri Jan 8 — Cape Town (6 Nights)','18–22°C','27–31°C','18–23°C'],
-      ['Fri Jan 8–Sun Jan 10 — Oudtshoorn / Cango Caves (2 Nights)','19–23°C','32–37°C','21–26°C'],
-      ['Sun Jan 10–Mon Jan 11 — Beaufort West (1 Night)','21–25°C','35–40°C','23–29°C'],
-      ['Mon Jan 11–Tue Jan 12 — Bloemfontein (1 Night)','20–24°C','32–37°C','21–26°C'],
-      ['Tue Jan 12–Thu Jan 14 — Benoni (Luke Meyer) (2 Nights)','17–21°C','27–31°C','18–22°C'],
-      ['Thu Jan 14–Sat Jan 16 — Two Wild Olives — Shumba Self-Catering Unit (2 Nights)','21–25°C','31–36°C','22–27°C'],
-      ['Sat Jan 16–Sun Jan 17 — Ukutula Lion Lodge & Research Centre (1 Night)','20–24°C','31–36°C','21–26°C']
-    ];
-
-    for(const [title,morning,afternoon,night] of temps){
-      const marker=`<div class="title">${title}</div>`;
-      const chips=`${marker}\n<div class="weather-chip-row" aria-label="Projected temperatures"><span class="weather-chip blue">🌅 MORNING ${morning}</span><span class="weather-chip red">☀️ AFTERNOON ${afternoon}</span><span class="weather-chip blue">🌙 NIGHT ${night}</span></div>`;
-      html=html.replace(marker,chips);
-    }
-
-    const firstWeatherTitle='<div class="title">Mon Dec 7 — Johannesburg Airport Hotel (1 Night)</div>';
-    const firstWeatherWithNote=firstWeatherTitle+'\n<div class="weather-note">Projected planning temperatures — El Niño adjusted; update with live forecasts closer to each stop.</div>';
-    html=html.replace(firstWeatherTitle,firstWeatherWithNote);
-
-    document.open();document.write(html);document.close();
-  }catch(e){
-    document.body.innerHTML='<div class="loading"><b>Itinerary could not load.</b><br><a style="color:#f0c975" href="itinerary-source.html">Open the source itinerary</a></div>';
-  }
+try{
+let html=await (await fetch('itinerary-source.html',{cache:'no-store'})).text();
+html=html.replace('<a href="#weather">Weather</a>\n','');
+html=html.replace(/<section class="section" id="weather">[\s\S]*?<\/section>\s*/,'');
+const pwaHead='<meta name="theme-color" content="#1f211b"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="site.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">';
+html=html.replace('</head>',pwaHead+'</head>');
+const chipCss=`.weather-chip-row{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}.weather-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:.15px;box-shadow:0 2px 5px rgba(0,0,0,.08)}.weather-chip.blue{background:#dceaf7;color:#174a78;border:1px solid #9fc1df}.weather-chip.red{background:#f8d9d5;color:#8e241c;border:1px solid #e4aaa3}.weather-note{font-size:11px;color:#71695b;margin:-7px 0 12px;font-weight:700}`;
+html=html.replace('</style>',chipCss+'</style>');
+const temps=[
+['Mon Dec 7 — Johannesburg Airport Hotel (1 Night)','17–21°C','26–30°C','18–22°C'],
+['Tue Dec 8–Fri Dec 11 — Sabie / Panorama Route (3 Nights)','17–20°C','26–30°C','17–21°C'],
+['Fri Dec 11 — Kruger National Park — Skukuza (1 Night)','23–27°C','34–38°C','25–29°C'],
+['Sat Dec 12–Mon Dec 14 — Kruger National Park — Satara (2 Nights)','24–28°C','35–39°C','25–30°C'],
+['Mon Dec 14 — Kruger National Park — Orpen (1 Night)','23–27°C','34–39°C','24–29°C'],
+['Tue Dec 15 — Ermelo Stopover (1 Night)','15–19°C','25–29°C','16–20°C'],
+['Wed Dec 16–Thu Dec 17 — Spion Kop Lodge (1 Night)','17–21°C','28–32°C','18–22°C'],
+['Thu Dec 17–Mon Dec 21 — Drakensberg (4 Nights)','12–17°C','23–27°C','12–17°C'],
+['Mon Dec 21–Sat Dec 26 — Empangeni / Hluhluwe / St Lucia / Richards Bay (5 Nights)','22–25°C','29–33°C','23–27°C'],
+['Sat Dec 26–Sun Dec 27 — Kokstad (1 Night)','15–19°C','25–29°C','16–20°C'],
+['Sun Dec 27–Mon Dec 28 — Beacon Bay / East London (1 Night)','19–22°C','24–28°C','20–23°C'],
+['Mon Dec 28–Wed Dec 30 — Kenton-on-Sea (2 Nights)','19–22°C','24–28°C','20–23°C'],
+['Wed Dec 30–Thu Dec 31 — Storms River (1 Night)','17–20°C','22–26°C','17–21°C'],
+['Thu Dec 31–Sat Jan 2 — Knysna / Robberg / Knysna Heads (2 Nights)','18–21°C','24–28°C','19–22°C'],
+['Sat Jan 2–Fri Jan 8 — Cape Town (6 Nights)','18–22°C','27–31°C','18–23°C'],
+['Fri Jan 8–Sun Jan 10 — Oudtshoorn / Cango Caves (2 Nights)','19–23°C','32–37°C','21–26°C'],
+['Sun Jan 10–Mon Jan 11 — Beaufort West (1 Night)','21–25°C','35–40°C','23–29°C'],
+['Mon Jan 11–Tue Jan 12 — Bloemfontein (1 Night)','20–24°C','32–37°C','21–26°C'],
+['Tue Jan 12–Thu Jan 14 — Benoni (Luke Meyer) (2 Nights)','17–21°C','27–31°C','18–22°C'],
+['Thu Jan 14–Sat Jan 16 — Two Wild Olives — Shumba Self-Catering Unit (2 Nights)','21–25°C','31–36°C','22–27°C'],
+['Sat Jan 16–Sun Jan 17 — Ukutula Lion Lodge & Research Centre (1 Night)','20–24°C','31–36°C','21–26°C']];
+for(const [title,morning,afternoon,night] of temps){const marker=`<div class="title">${title}</div>`;const chips=`${marker}<div class="weather-chip-row" aria-label="Projected temperatures"><span class="weather-chip blue">🌅 MORNING ${morning}</span><span class="weather-chip red">☀️ AFTERNOON ${afternoon}</span><span class="weather-chip blue">🌙 NIGHT ${night}</span></div>`;html=html.replace(marker,chips)}
+const first='<div class="title">Mon Dec 7 — Johannesburg Airport Hotel (1 Night)</div>';
+html=html.replace(first,first+'<div class="weather-note">Projected planning temperatures — El Niño adjusted; update with live forecasts closer to each stop.</div>');
+document.open();document.write(html);document.close();
+}catch(e){document.body.innerHTML='<div class="loading"><b>Itinerary could not load.</b><br><a style="color:#f0c975" href="itinerary-source.html">Open the source itinerary</a></div>'}
 })();
 </script>
-
 </body>
 </html>
