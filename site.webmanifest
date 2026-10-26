@@ -1,4 +1,5 @@
 {
+  "id": "./",
   "name": "South Africa Trip — 25th Anniversary",
   "short_name": "South Africa",
   "description": "South Africa family trip and 25th anniversary itinerary",
@@ -18,7 +19,7 @@
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
