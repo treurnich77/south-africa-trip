@@ -1,4 +1,4 @@
-const CACHE = "south-africa-trip-v2";
+const CACHE = "south-africa-trip-v3";
 const CORE = ["./", "./index.html", "./itinerary-source.html", "./site.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", event => {
