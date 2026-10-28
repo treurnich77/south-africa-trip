@@ -17,7 +17,7 @@
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(console.error)}
 (async()=>{
 try{
-let html=await (await fetch('itinerary-source.html?v=20261028-1',{cache:'no-store'})).text();
+let html=await (await fetch('itinerary-source.html?v=20261028-2',{cache:'no-store'})).text();
 html=html.replace('<a href="#weather">Weather</a>\n','');
 html=html.replace(/<section class="section" id="weather">[\s\S]*?<\/section>\s*/,'');
 const pwaHead='<meta name="theme-color" content="#1f211b"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="site.webmanifest?v=3"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=3"><link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png?v=3">';
@@ -50,7 +50,7 @@ for(const [title,morning,afternoon,night] of temps){const marker=`<div class="ti
 const first='<div class="title">Mon Dec 7 — Johannesburg Airport Hotel (1 Night)</div>';
 html=html.replace(first,first+'<div class="weather-note">Projected planning temperatures — El Niño adjusted; update with live forecasts closer to each stop.</div>');
 document.open();document.write(html);document.close();
-}catch(e){document.body.innerHTML='<div class="loading"><b>Itinerary could not load.</b><br><a style="color:#f0c975" href="itinerary-source.html?v=20261028-1">Open the source itinerary</a></div>'}
+}catch(e){document.body.innerHTML='<div class="loading"><b>Itinerary could not load.</b><br><a style="color:#f0c975" href="itinerary-source.html?v=20261028-2">Open the source itinerary</a></div>'}
 })();
 </script>
 </body>
